@@ -1,0 +1,15 @@
+com\govconnect\config\JwtConfig.class
+com\govconnect\complaints\service\ComplaintService.class
+com\govconnect\complaints\domain\TargetType.class
+com\govconnect\identity\client\AuthServiceClient.class
+com\govconnect\complaints\api\dto\ComplaintDto.class
+com\govconnect\identity\client\IdentityMeResponse.class
+com\govconnect\complaints\service\ComplaintCodeService.class
+com\govconnect\complaints\api\ComplaintController.class
+com\govconnect\complaints\repo\ComplaintRepository.class
+com\govconnect\complaints\api\dto\CreateComplaintRequest.class
+com\govconnect\config\SecurityConfig.class
+com\govconnect\common\api\GlobalExceptionHandler.class
+com\govconnect\complaints\domain\ComplaintStatus.class
+com\govconnect\ComplaintServiceApplication.class
+com\govconnect\complaints\domain\Complaint.class

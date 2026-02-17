@@ -1,0 +1,12 @@
+com\govconnect\config\JwtConfig.class
+com\govconnect\DepartmentServiceApplication.class
+com\govconnect\departments\repo\DepartmentRepository.class
+com\govconnect\departments\domain\Department.class
+com\govconnect\departments\repo\DepartmentOfficeRepository.class
+com\govconnect\config\SecurityConfig.class
+com\govconnect\departments\api\dto\DepartmentOfficeDto.class
+com\govconnect\common\api\GlobalExceptionHandler.class
+com\govconnect\departments\api\DepartmentController.class
+com\govconnect\departments\domain\DepartmentOffice.class
+com\govconnect\departments\domain\DepartmentType.class
+com\govconnect\departments\api\dto\DepartmentDto.class
