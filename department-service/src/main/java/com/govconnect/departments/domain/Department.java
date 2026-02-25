@@ -23,9 +23,6 @@ public class Department {
   @Column(name = "type", nullable = false)
   private DepartmentType type;
 
-  @Column(name = "head_office_name")
-  private String headOfficeName;
-
   public UUID getId() {
     return id;
   }
@@ -48,13 +45,5 @@ public class Department {
 
   public void setType(DepartmentType type) {
     this.type = type;
-  }
-
-  public String getHeadOfficeName() {
-    return headOfficeName;
-  }
-
-  public void setHeadOfficeName(String headOfficeName) {
-    this.headOfficeName = headOfficeName;
   }
 }

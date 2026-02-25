@@ -42,7 +42,8 @@ public class IdentityController {
         profile == null ? null : profile.getProvinceId(),
         profile == null ? null : profile.getDistrictId(),
         profile == null ? null : profile.getDsDivisionId(),
-        profile == null ? null : profile.getGnDivisionId()
+        profile == null ? null : profile.getGnDivisionId(),
+        profile == null ? null : profile.getDepartmentId()
     ));
   }
 }

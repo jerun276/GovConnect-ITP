@@ -60,8 +60,18 @@ public class ComplaintController {
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<ComplaintDto> get(@PathVariable UUID id) {
-    return ResponseEntity.ok(complaintService.get(id));
+  public ResponseEntity<ComplaintDto> get(@PathVariable UUID id,
+                                         @AuthenticationPrincipal Jwt jwt,
+                                         @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String authorization) {
+    UUID actorUserId = UUID.fromString(jwt.getSubject());
+    String actorUserType = jwt.getClaimAsString("userType");
+
+    IdentityMeResponse identity = null;
+    if (!"citizen".equalsIgnoreCase(actorUserType)) {
+      identity = authServiceClient.me(authorization);
+    }
+
+    return ResponseEntity.ok(complaintService.getForActor(identity, actorUserId, actorUserType, id));
   }
 
   @GetMapping("/queue")
@@ -122,8 +132,16 @@ public class ComplaintController {
 
   @GetMapping("/{id}/timeline")
   public ResponseEntity<ComplaintTimelineResponse> timeline(@PathVariable UUID id,
-                                                            @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
-    IdentityMeResponse identity = authServiceClient.me(authorization);
-    return ResponseEntity.ok(complaintService.timeline(identity, id));
+                                                            @AuthenticationPrincipal Jwt jwt,
+                                                            @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String authorization) {
+    UUID actorUserId = UUID.fromString(jwt.getSubject());
+    String actorUserType = jwt.getClaimAsString("userType");
+
+    IdentityMeResponse identity = null;
+    if (!"citizen".equalsIgnoreCase(actorUserType)) {
+      identity = authServiceClient.me(authorization);
+    }
+
+    return ResponseEntity.ok(complaintService.timelineForActor(identity, actorUserId, actorUserType, id));
   }
 }

@@ -64,16 +64,14 @@ public class ComplaintService {
   public ComplaintDto create(UUID submittedByUserId, CreateComplaintRequest request, String authorizationHeader) {
     Instant now = Instant.now();
 
-    if (request.targetType() != TargetType.statutory_board) {
-      if (request.incidentProvinceId() == null) {
-        throw new BadRequestException("incidentProvinceId must not be null");
-      }
-      if (request.incidentDistrictId() == null) {
-        throw new BadRequestException("incidentDistrictId must not be null");
-      }
-      if (request.incidentDsDivisionId() == null) {
-        throw new BadRequestException("incidentDsDivisionId must not be null");
-      }
+    if (request.incidentProvinceId() == null) {
+      throw new BadRequestException("incidentProvinceId must not be null");
+    }
+    if (request.incidentDistrictId() == null) {
+      throw new BadRequestException("incidentDistrictId must not be null");
+    }
+    if (request.incidentDsDivisionId() == null) {
+      throw new BadRequestException("incidentDsDivisionId must not be null");
     }
 
     String complaintCode;
@@ -150,6 +148,30 @@ public class ComplaintService {
   }
 
   @Transactional(readOnly = true)
+  public ComplaintDto getForActor(com.govconnect.identity.client.IdentityMeResponse identity,
+                                 UUID actorUserId,
+                                 String actorUserType,
+                                 UUID complaintId) {
+    Complaint c = complaintRepository.findById(complaintId)
+        .orElseThrow(() -> new NotFoundException("complaint not found"));
+
+    if (actorUserType == null) {
+      throw new ForbiddenException("not authorized");
+    }
+
+    if ("citizen".equalsIgnoreCase(actorUserType)) {
+      if (actorUserId == null || !actorUserId.equals(c.getSubmittedByUserId())) {
+        throw new ForbiddenException("not authorized");
+      }
+      return toDto(c);
+    }
+
+    requireAuthority(identity);
+    ensureCanViewInQueue(identity, c);
+    return toDto(c);
+  }
+
+  @Transactional(readOnly = true)
   public List<ComplaintDto> queue(IdentityMeResponse identity) {
     if (identity == null || identity.userType() == null) {
       throw new BadRequestException("identity not available");
@@ -188,7 +210,19 @@ public class ComplaintService {
           throw new BadRequestException("gn scope missing");
         complaints = complaintRepository.findByIncidentGnDivisionIdOrderByCreatedAtDesc(identity.gnDivisionId());
       }
+      case "DEPT_HEAD" -> {
+        if (identity.departmentId() == null) {
+          throw new BadRequestException("department scope missing");
+        }
+        complaints = complaintRepository.findBySelectedDepartmentIdOrderByCreatedAtDesc(identity.departmentId());
+      }
       default -> complaints = List.of();
+    }
+
+    if (!"DEPT_HEAD".equalsIgnoreCase(level)) {
+      complaints = complaints.stream().filter(c -> !isDepartmentRouted(c)).toList();
+    } else {
+      complaints = complaints.stream().filter(this::isDepartmentRouted).toList();
     }
 
     return complaints.stream().map(this::toDto).toList();
@@ -374,6 +408,35 @@ public class ComplaintService {
 
     ensureCanViewInQueue(actorIdentity, c);
 
+    return buildTimelineResponse(c, complaintId);
+  }
+
+  @Transactional(readOnly = true)
+  public ComplaintTimelineResponse timelineForActor(IdentityMeResponse identity,
+                                                    UUID actorUserId,
+                                                    String actorUserType,
+                                                    UUID complaintId) {
+    Complaint c = complaintRepository.findById(complaintId)
+        .orElseThrow(() -> new NotFoundException("complaint not found"));
+
+    if (actorUserType == null) {
+      throw new ForbiddenException("not authorized");
+    }
+
+    if ("citizen".equalsIgnoreCase(actorUserType)) {
+      if (actorUserId == null || !actorUserId.equals(c.getSubmittedByUserId())) {
+        throw new ForbiddenException("not authorized");
+      }
+      return buildTimelineResponse(c, complaintId);
+    }
+
+    requireAuthority(identity);
+    ensureCanViewInQueue(identity, c);
+    return buildTimelineResponse(c, complaintId);
+  }
+
+  private ComplaintTimelineResponse buildTimelineResponse(Complaint c, UUID complaintId) {
+
     List<ComplaintTimelineItemDto> items = new java.util.ArrayList<>();
 
     for (ComplaintStatusHistory h : statusHistoryRepository.findByComplaintIdOrderByCreatedAtAsc(complaintId)) {
@@ -449,6 +512,20 @@ public class ComplaintService {
       throw new ForbiddenException("authority profile not found");
     }
 
+    if (isDepartmentRouted(complaint)) {
+      if (!"DEPT_HEAD".equalsIgnoreCase(level)) {
+        throw new ForbiddenException("out of scope");
+      }
+      if (identity.departmentId() == null) {
+        throw new BadRequestException("department scope missing");
+      }
+      if (complaint.getSelectedDepartmentId() == null
+          || !identity.departmentId().equals(complaint.getSelectedDepartmentId())) {
+        throw new ForbiddenException("out of scope");
+      }
+      return;
+    }
+
     switch (level) {
       case "CENTRAL" -> {
       }
@@ -478,8 +555,15 @@ public class ComplaintService {
           throw new ForbiddenException("out of scope");
         }
       }
+      case "DEPT_HEAD" -> throw new ForbiddenException("out of scope");
       default -> throw new ForbiddenException("out of scope");
     }
+  }
+
+  private boolean isDepartmentRouted(Complaint complaint) {
+    return complaint != null
+        && (complaint.getTargetType() == TargetType.department
+            || complaint.getTargetType() == TargetType.statutory_board);
   }
 
   private void createStatusHistory(UUID complaintId,

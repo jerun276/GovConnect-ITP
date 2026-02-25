@@ -13,5 +13,6 @@ public record IdentityMeResponse(
     UUID provinceId,
     UUID districtId,
     UUID dsDivisionId,
-    UUID gnDivisionId
+    UUID gnDivisionId,
+    UUID departmentId
 ) {}

@@ -13,8 +13,8 @@ public record CreateComplaintRequest(
     @NotNull TargetType targetType,
     UUID selectedDepartmentId,
     UUID selectedStatutoryBoardId,
-    UUID incidentProvinceId,
-    UUID incidentDistrictId,
-    UUID incidentDsDivisionId,
+    @NotNull UUID incidentProvinceId,
+    @NotNull UUID incidentDistrictId,
+    @NotNull UUID incidentDsDivisionId,
     UUID incidentGnDivisionId
 ) {}

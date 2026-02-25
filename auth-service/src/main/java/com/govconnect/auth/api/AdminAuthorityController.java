@@ -75,7 +75,7 @@ public class AdminAuthorityController {
     User user = new User();
     user.setId(UUID.randomUUID());
     user.setUserType(UserType.authority);
-    user.setUsername(null);
+    user.setUsername(request.officialEmail());
     user.setEmail(request.officialEmail());
     user.setPasswordHash(passwordEncoder.encode(UUID.randomUUID().toString()));
     user.setPasswordSet(false);

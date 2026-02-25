@@ -13,10 +13,12 @@ import org.springframework.web.bind.annotation.RestController;
 import com.govconnect.common.api.NotFoundException;
 import com.govconnect.departments.api.dto.DepartmentDto;
 import com.govconnect.departments.api.dto.DepartmentOfficeDto;
+import com.govconnect.departments.api.dto.StatutoryBoardDto;
 import com.govconnect.departments.domain.Department;
 import com.govconnect.departments.domain.DepartmentOffice;
 import com.govconnect.departments.repo.DepartmentOfficeRepository;
 import com.govconnect.departments.repo.DepartmentRepository;
+import com.govconnect.departments.repo.StatutoryBoardRepository;
 
 @RestController
 @RequestMapping("/api/departments")
@@ -24,11 +26,14 @@ public class DepartmentController {
 
   private final DepartmentRepository departmentRepository;
   private final DepartmentOfficeRepository officeRepository;
+  private final StatutoryBoardRepository statutoryBoardRepository;
 
   public DepartmentController(DepartmentRepository departmentRepository,
-      DepartmentOfficeRepository officeRepository) {
+      DepartmentOfficeRepository officeRepository,
+      StatutoryBoardRepository statutoryBoardRepository) {
     this.departmentRepository = departmentRepository;
     this.officeRepository = officeRepository;
+    this.statutoryBoardRepository = statutoryBoardRepository;
   }
 
   @GetMapping
@@ -63,8 +68,16 @@ public class DepartmentController {
     return ResponseEntity.ok(offices);
   }
 
+  @GetMapping("/{id}/statutory-boards")
+  public ResponseEntity<List<StatutoryBoardDto>> statutoryBoards(@PathVariable UUID id) {
+    var boards = statutoryBoardRepository.findByDepartment_Id(id).stream()
+        .map(b -> new StatutoryBoardDto(b.getId(), b.getDepartment().getId(), b.getName()))
+        .toList();
+    return ResponseEntity.ok(boards);
+  }
+
   private DepartmentDto toDto(Department d) {
-    return new DepartmentDto(d.getId(), d.getName(), d.getType(), d.getHeadOfficeName());
+    return new DepartmentDto(d.getId(), d.getName(), d.getType());
   }
 
   private DepartmentOfficeDto toOfficeDto(DepartmentOffice o) {

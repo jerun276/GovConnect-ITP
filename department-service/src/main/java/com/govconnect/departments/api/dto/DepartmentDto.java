@@ -7,6 +7,5 @@ import com.govconnect.departments.domain.DepartmentType;
 public record DepartmentDto(
     UUID id,
     String name,
-    DepartmentType type,
-    String headOfficeName
+    DepartmentType type
 ) {}
