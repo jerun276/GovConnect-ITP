@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
+import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "GovConnect Authority",
-  description: "Authority portal"
+  title: "GovConnect Authority Portal",
+  description: "Admin and Authority portal for GovConnect",
 };
 
 export default function RootLayout({
@@ -12,7 +13,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body style={{ fontFamily: "system-ui, -apple-system, Segoe UI, Roboto, Arial" }}>
+      <body className="antialiased min-h-screen">
         {children}
       </body>
     </html>
