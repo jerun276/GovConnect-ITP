@@ -12,8 +12,9 @@ public record CreateComplaintRequest(
     @NotBlank String descriptionText,
     @NotNull TargetType targetType,
     UUID selectedDepartmentId,
-    @NotNull UUID incidentProvinceId,
-    @NotNull UUID incidentDistrictId,
-    @NotNull UUID incidentDsDivisionId,
+    UUID selectedStatutoryBoardId,
+    UUID incidentProvinceId,
+    UUID incidentDistrictId,
+    UUID incidentDsDivisionId,
     UUID incidentGnDivisionId
 ) {}

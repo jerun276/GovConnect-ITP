@@ -40,6 +40,9 @@ public class AuthorityProfile {
   @Column(name = "gn_division_id")
   private UUID gnDivisionId;
 
+  @Column(name = "department_id")
+  private UUID departmentId;
+
   @Column(name = "status", nullable = false)
   private String status;
 
@@ -114,6 +117,14 @@ public class AuthorityProfile {
 
   public void setGnDivisionId(UUID gnDivisionId) {
     this.gnDivisionId = gnDivisionId;
+  }
+
+  public UUID getDepartmentId() {
+    return departmentId;
+  }
+
+  public void setDepartmentId(UUID departmentId) {
+    this.departmentId = departmentId;
   }
 
   public String getStatus() {

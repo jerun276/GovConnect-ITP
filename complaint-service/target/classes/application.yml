@@ -28,6 +28,8 @@ app:
 clients:
   auth-service:
     base-url: ${AUTH_SERVICE_BASE_URL:http://localhost:8081}
+  department-service:
+    base-url: ${DEPARTMENT_SERVICE_BASE_URL:http://localhost:8082}
 
 management:
   endpoints:

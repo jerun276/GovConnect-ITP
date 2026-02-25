@@ -47,6 +47,7 @@ public class AuthService {
     user.setUsername(request.username());
     user.setEmail(request.email());
     user.setPasswordHash(passwordEncoder.encode(request.password()));
+    user.setPasswordSet(true);
     user.setBanned(false);
     user.setCreatedAt(now);
     user.setUpdatedAt(now);
@@ -67,6 +68,10 @@ public class AuthService {
 
     if (user.isBanned()) {
       throw new IllegalArgumentException("account banned");
+    }
+
+    if (!user.isPasswordSet()) {
+      throw new IllegalArgumentException("password setup required");
     }
 
     if (!passwordEncoder.matches(request.password(), user.getPasswordHash())) {

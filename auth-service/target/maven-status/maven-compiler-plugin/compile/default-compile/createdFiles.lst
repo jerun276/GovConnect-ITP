@@ -7,6 +7,7 @@ com\govconnect\auth\api\dto\AuthResponse.class
 com\govconnect\auth\repo\UserRepository.class
 com\govconnect\auth\api\AuthController.class
 com\govconnect\AuthServiceApplication.class
+com\govconnect\auth\api\AdminAuthorityController$1.class
 com\govconnect\identity\domain\AuthorityProfile.class
 com\govconnect\auth\domain\UserType.class
 com\govconnect\auth\service\JwtTokenService.class

@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.govconnect.complaints.api.dto.AddInternalNoteRequest;
 import com.govconnect.complaints.api.dto.AddResponseRequest;
 import com.govconnect.complaints.api.dto.AssignComplaintRequest;
+import com.govconnect.complaints.api.dto.AuthorityRequestDetailsRequest;
+import com.govconnect.complaints.api.dto.CitizenProvideDetailsRequest;
 import com.govconnect.complaints.api.dto.ComplaintDto;
 import com.govconnect.complaints.api.dto.ComplaintTimelineResponse;
 import com.govconnect.complaints.api.dto.CreateComplaintRequest;
@@ -45,9 +47,10 @@ public class ComplaintController {
 
   @PostMapping
   public ResponseEntity<ComplaintDto> create(@AuthenticationPrincipal Jwt jwt,
+                                            @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
                                             @Valid @RequestBody CreateComplaintRequest request) {
     UUID userId = UUID.fromString(jwt.getSubject());
-    return ResponseEntity.ok(complaintService.create(userId, request));
+    return ResponseEntity.ok(complaintService.create(userId, request, authorization));
   }
 
   @GetMapping("/mine")
@@ -99,6 +102,22 @@ public class ComplaintController {
     IdentityMeResponse identity = authServiceClient.me(authorization);
     complaintService.addResponse(identity, id, request.message());
     return ResponseEntity.ok().build();
+  }
+
+  @PostMapping("/{id}/request-details")
+  public ResponseEntity<ComplaintDto> requestDetails(@PathVariable UUID id,
+                                                     @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
+                                                     @Valid @RequestBody AuthorityRequestDetailsRequest request) {
+    IdentityMeResponse identity = authServiceClient.me(authorization);
+    return ResponseEntity.ok(complaintService.requestCitizenDetails(identity, id, request.message()));
+  }
+
+  @PostMapping("/{id}/provide-details")
+  public ResponseEntity<ComplaintDto> provideDetails(@PathVariable UUID id,
+                                                     @AuthenticationPrincipal Jwt jwt,
+                                                     @Valid @RequestBody CitizenProvideDetailsRequest request) {
+    UUID userId = UUID.fromString(jwt.getSubject());
+    return ResponseEntity.ok(complaintService.citizenProvideDetails(userId, id, request.message()));
   }
 
   @GetMapping("/{id}/timeline")

@@ -45,6 +45,9 @@ public class Complaint {
   @Column(name = "selected_department_id")
   private UUID selectedDepartmentId;
 
+  @Column(name = "selected_statutory_board_id")
+  private UUID selectedStatutoryBoardId;
+
   @Column(name = "incident_province_id", nullable = false)
   private UUID incidentProvinceId;
 
@@ -157,6 +160,14 @@ public class Complaint {
 
   public void setSelectedDepartmentId(UUID selectedDepartmentId) {
     this.selectedDepartmentId = selectedDepartmentId;
+  }
+
+  public UUID getSelectedStatutoryBoardId() {
+    return selectedStatutoryBoardId;
+  }
+
+  public void setSelectedStatutoryBoardId(UUID selectedStatutoryBoardId) {
+    this.selectedStatutoryBoardId = selectedStatutoryBoardId;
   }
 
   public UUID getIncidentProvinceId() {

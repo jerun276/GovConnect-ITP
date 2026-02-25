@@ -5,10 +5,13 @@ import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import jakarta.validation.ConstraintViolationException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -49,6 +52,28 @@ public class GlobalExceptionHandler {
                     (a, b) -> a
                 ))
         ));
+  }
+
+  @ExceptionHandler(HttpMessageNotReadableException.class)
+  public ResponseEntity<Map<String, Object>> notReadable(HttpMessageNotReadableException ex) {
+    String message = null;
+    if (ex.getMostSpecificCause() != null) {
+      message = ex.getMostSpecificCause().getMessage();
+    } else {
+      message = ex.getMessage();
+    }
+
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+        .body(Map.of(
+            "error", "invalid_request_body",
+            "message", message == null ? "invalid request body" : message
+        ));
+  }
+
+  @ExceptionHandler(ConstraintViolationException.class)
+  public ResponseEntity<Map<String, Object>> constraintViolation(ConstraintViolationException ex) {
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+        .body(Map.of("error", "validation_failed"));
   }
 
   @ExceptionHandler(Exception.class)

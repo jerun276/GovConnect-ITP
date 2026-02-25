@@ -28,14 +28,20 @@ public class JwtTokenService {
     Instant now = Instant.now();
     Instant exp = now.plusSeconds(expirationSeconds);
 
-    JwtClaimsSet claims = JwtClaimsSet.builder()
+    JwtClaimsSet.Builder claimsBuilder = JwtClaimsSet.builder()
         .issuedAt(now)
         .expiresAt(exp)
         .subject(user.getId().toString())
-        .claim("email", user.getEmail())
-        .claim("username", user.getUsername())
-        .claim("userType", user.getUserType().name())
-        .build();
+        .claim("userType", user.getUserType().name());
+
+    if (user.getEmail() != null) {
+      claimsBuilder.claim("email", user.getEmail());
+    }
+    if (user.getUsername() != null) {
+      claimsBuilder.claim("username", user.getUsername());
+    }
+
+    JwtClaimsSet claims = claimsBuilder.build();
 
     JwsHeader header = JwsHeader.with(MacAlgorithm.HS256).build();
     return jwtEncoder.encode(JwtEncoderParameters.from(header, claims)).getTokenValue();

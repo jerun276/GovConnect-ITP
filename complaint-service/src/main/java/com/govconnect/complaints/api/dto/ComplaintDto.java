@@ -14,6 +14,7 @@ public record ComplaintDto(
     String descriptionText,
     TargetType targetType,
     UUID selectedDepartmentId,
+    UUID selectedStatutoryBoardId,
     UUID incidentProvinceId,
     UUID incidentDistrictId,
     UUID incidentDsDivisionId,

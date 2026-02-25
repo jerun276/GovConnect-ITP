@@ -5,6 +5,8 @@ import java.util.UUID;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
@@ -23,6 +25,10 @@ public class ComplaintResponse {
 
   @Column(name = "message", nullable = false)
   private String message;
+
+  @Enumerated(EnumType.STRING)
+  @Column(name = "message_type", nullable = false)
+  private ComplaintResponseType messageType;
 
   @Column(name = "created_at", nullable = false)
   private Instant createdAt;
@@ -57,6 +63,14 @@ public class ComplaintResponse {
 
   public void setMessage(String message) {
     this.message = message;
+  }
+
+  public ComplaintResponseType getMessageType() {
+    return messageType;
+  }
+
+  public void setMessageType(ComplaintResponseType messageType) {
+    this.messageType = messageType;
   }
 
   public Instant getCreatedAt() {

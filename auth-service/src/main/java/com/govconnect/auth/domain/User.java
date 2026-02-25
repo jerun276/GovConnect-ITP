@@ -30,6 +30,9 @@ public class User {
   @Column(name = "password_hash", nullable = false)
   private String passwordHash;
 
+  @Column(name = "password_set", nullable = false)
+  private boolean passwordSet;
+
   @Column(name = "is_banned", nullable = false)
   private boolean banned;
 
@@ -83,6 +86,14 @@ public class User {
 
   public void setPasswordHash(String passwordHash) {
     this.passwordHash = passwordHash;
+  }
+
+  public boolean isPasswordSet() {
+    return passwordSet;
+  }
+
+  public void setPasswordSet(boolean passwordSet) {
+    this.passwordSet = passwordSet;
   }
 
   public boolean isBanned() {
