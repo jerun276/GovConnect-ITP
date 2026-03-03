@@ -1,0 +1,852 @@
+{
+  "info": {
+    "name": "GovConnect Complete Flow Automation",
+    "description": "Complete API automation for GovConnect: Citizen → Admin → Authority → Complaint workflow with geographic divisions",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Setup & Reference Data",
+      "item": [
+        {
+          "name": "Get Departments",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{departmentBaseUrl}}/api/departments",
+              "host": ["{{departmentBaseUrl}}"],
+              "path": ["api", "departments"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "if (json.length > 0) {",
+                  "  pm.environment.set('departmentId', json[0].id);",
+                  "  console.log('Department ID set:', json[0].id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Statutory Boards by Department",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{departmentBaseUrl}}/api/departments/{{departmentId}}/statutory-boards",
+              "host": ["{{departmentBaseUrl}}"],
+              "path": ["api", "departments", "{{departmentId}}", "statutory-boards"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "2. Citizen Registration & Login",
+      "item": [
+        {
+          "name": "Register Citizen",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"{{citizenName}}\",\n  \"email\": \"{{citizenEmail}}\",\n  \"password\": \"{{citizenPassword}}\",\n  \"nicNumber\": \"{{citizenNic}}\",\n  \"phoneNumber\": \"{{citizenPhone}}\",\n  \"provinceId\": \"{{jaffnaProvinceId}}\",\n  \"districtId\": \"{{jaffnaDistrictId}}\",\n  \"dsDivisionId\": \"{{nallurDsId}}\",\n  \"gnDivisionId\": \"{{thirunelveliWestGnId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{authBaseUrl}}/api/auth/register",
+              "host": ["{{authBaseUrl}}"],
+              "path": ["api", "auth", "register"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "pm.environment.set('citizenToken', json.accessToken);",
+                  "console.log('Citizen registered successfully');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Citizen Login",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identifier\": \"{{citizenEmail}}\",\n  \"password\": \"{{citizenPassword}}\"\n}"
+            },
+            "url": {
+              "raw": "{{authBaseUrl}}/api/auth/login",
+              "host": ["{{authBaseUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "pm.environment.set('citizenToken', json.accessToken);",
+                  "console.log('Citizen token refreshed');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Citizen Profile",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{citizenToken}}" }],
+            "url": {
+              "raw": "{{authBaseUrl}}/api/auth/me",
+              "host": ["{{authBaseUrl}}"],
+              "path": ["api", "auth", "me"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "pm.environment.set('citizenUserId', json.sub);",
+                  "console.log('Citizen ID:', json.sub);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "3. Admin Operations - Authority Management",
+      "item": [
+        {
+          "name": "Admin Login",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identifier\": \"{{adminEmail}}\",\n  \"password\": \"{{adminPassword}}\"\n}"
+            },
+            "url": {
+              "raw": "{{authBaseUrl}}/api/auth/login",
+              "host": ["{{authBaseUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "pm.environment.set('adminToken', json.accessToken);",
+                  "console.log('Admin logged in successfully');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Authority Officer (DS Level - Jaffna)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"{{officerName}}\",\n  \"officialEmail\": \"{{officerEmail}}\",\n  \"officialRoleLevel\": \"DS\",\n  \"dsDivisionId\": \"{{jaffnaDsId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{authBaseUrl}}/api/admin/authorities",
+              "host": ["{{authBaseUrl}}"],
+              "path": ["api", "admin", "authorities"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "pm.environment.set('officerUserId', json.userId);",
+                  "pm.environment.set('passwordSetupToken', json.passwordSetupToken);",
+                  "console.log('Officer created. User ID:', json.userId);",
+                  "console.log('Password setup token:', json.passwordSetupToken);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Authority Officer (GS Level - Nallur)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"{{gsOfficerName}}\",\n  \"officialEmail\": \"{{gsOfficerEmail}}\",\n  \"officialRoleLevel\": \"GS\",\n  \"gnDivisionId\": \"{{nallurNorthGnId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{authBaseUrl}}/api/admin/authorities",
+              "host": ["{{authBaseUrl}}"],
+              "path": ["api", "admin", "authorities"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "pm.environment.set('gsOfficerUserId', json.userId);",
+                  "pm.environment.set('gsPasswordSetupToken', json.passwordSetupToken);",
+                  "console.log('GS Officer created. User ID:', json.userId);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Password Reset Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": {
+              "raw": "{{authBaseUrl}}/api/admin/authorities/{{officerUserId}}/password-setup-token",
+              "host": ["{{authBaseUrl}}"],
+              "path": ["api", "admin", "authorities", "{{officerUserId}}", "password-setup-token"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "pm.environment.set('passwordSetupToken', json.passwordSetupToken);",
+                  "console.log('New password setup token:', json.passwordSetupToken);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "List Pending Authority Applications",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": {
+              "raw": "{{authBaseUrl}}/api/identity/authority/applications/pending",
+              "host": ["{{authBaseUrl}}"],
+              "path": ["api", "identity", "authority", "applications", "pending"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Approve Authority Application",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": {
+              "raw": "{{authBaseUrl}}/api/identity/authority/applications/{{pendingUserId}}/approve",
+              "host": ["{{authBaseUrl}}"],
+              "path": ["api", "identity", "authority", "applications", "{{pendingUserId}}", "approve"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "4. Officer Password Setup & Login",
+      "item": [
+        {
+          "name": "Setup Officer Password",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"{{passwordSetupToken}}\",\n  \"newPassword\": \"{{officerPassword}}\"\n}"
+            },
+            "url": {
+              "raw": "{{authBaseUrl}}/api/admin/authorities/password-setup/confirm",
+              "host": ["{{authBaseUrl}}"],
+              "path": ["api", "admin", "authorities", "password-setup", "confirm"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "pm.environment.set('officerToken', json.accessToken);",
+                  "console.log('Officer password set successfully');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Officer Login",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identifier\": \"{{officerEmail}}\",\n  \"password\": \"{{officerPassword}}\"\n}"
+            },
+            "url": {
+              "raw": "{{authBaseUrl}}/api/auth/login",
+              "host": ["{{authBaseUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "pm.environment.set('officerToken', json.accessToken);",
+                  "console.log('Officer logged in successfully');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Officer Identity",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{officerToken}}" }],
+            "url": {
+              "raw": "{{authBaseUrl}}/api/identity/me",
+              "host": ["{{authBaseUrl}}"],
+              "path": ["api", "identity", "me"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "console.log('Officer Role Level:', json.officialRoleLevel);",
+                  "console.log('Officer DS Division:', json.dsDivisionId);",
+                  "console.log('Officer GN Division:', json.gnDivisionId);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "5. Complaint Management Flow",
+      "item": [
+        {
+          "name": "Submit Complaint (Citizen)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{citizenToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryCode\": \"ROAD\",\n  \"descriptionText\": \"There is a large pothole on the main road near the temple in Nallur that needs immediate attention. It has caused several accidents.\",\n  \"targetType\": \"department\",\n  \"selectedDepartmentId\": \"{{departmentId}}\",\n  \"incidentProvinceId\": \"{{jaffnaProvinceId}}\",\n  \"incidentDistrictId\": \"{{jaffnaDistrictId}}\",\n  \"incidentDsDivisionId\": \"{{nallurDsId}}\",\n  \"incidentGnDivisionId\": \"{{thirunelveliWestGnId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{complaintBaseUrl}}/api/complaints",
+              "host": ["{{complaintBaseUrl}}"],
+              "path": ["api", "complaints"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "pm.environment.set('complaintId', json.id);",
+                  "pm.environment.set('complaintCode', json.complaintCode);",
+                  "console.log('Complaint submitted. Code:', json.complaintCode);",
+                  "console.log('Complaint ID:', json.id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Citizen's Complaints",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{citizenToken}}" }],
+            "url": {
+              "raw": "{{complaintBaseUrl}}/api/complaints/mine",
+              "host": ["{{complaintBaseUrl}}"],
+              "path": ["api", "complaints", "mine"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Complaint Details (Citizen View)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{citizenToken}}" }],
+            "url": {
+              "raw": "{{complaintBaseUrl}}/api/complaints/{{complaintId}}",
+              "host": ["{{complaintBaseUrl}}"],
+              "path": ["api", "complaints", "{{complaintId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Authority Queue (Filtered by Jurisdiction)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{officerToken}}" }],
+            "url": {
+              "raw": "{{complaintBaseUrl}}/api/complaints/queue",
+              "host": ["{{complaintBaseUrl}}"],
+              "path": ["api", "complaints", "queue"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "console.log('Queue count:', json.length);",
+                  "console.log('Complaint codes in queue:', json.map(c => c.complaintCode).join(', '));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Complaint Details (Authority View)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{officerToken}}" }],
+            "url": {
+              "raw": "{{complaintBaseUrl}}/api/complaints/{{complaintId}}",
+              "host": ["{{complaintBaseUrl}}"],
+              "path": ["api", "complaints", "{{complaintId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Assign Complaint to Officer",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{officerToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"assignedToUserId\": \"{{officerUserId}}\",\n  \"reason\": \"Assigned to DS officer for initial review and site inspection\"\n}"
+            },
+            "url": {
+              "raw": "{{complaintBaseUrl}}/api/complaints/{{complaintId}}/assign",
+              "host": ["{{complaintBaseUrl}}"],
+              "path": ["api", "complaints", "{{complaintId}}", "assign"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Status - Under Review",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{officerToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"toStatus\": \"under_review\",\n  \"note\": \"Site inspection scheduled for tomorrow. Will assess damage and prepare repair estimate.\"\n}"
+            },
+            "url": {
+              "raw": "{{complaintBaseUrl}}/api/complaints/{{complaintId}}/status",
+              "host": ["{{complaintBaseUrl}}"],
+              "path": ["api", "complaints", "{{complaintId}}", "status"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add Internal Note",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{officerToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"note\": \"Contacted local contractor for repair estimate. Awaiting quote for asphalt patching.\"\n}"
+            },
+            "url": {
+              "raw": "{{complaintBaseUrl}}/api/complaints/{{complaintId}}/internal-notes",
+              "host": ["{{complaintBaseUrl}}"],
+              "path": ["api", "complaints", "{{complaintId}}", "internal-notes"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Request Details from Citizen",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{officerToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Could you please provide the exact landmark near the pothole and any photos if available?\"\n}"
+            },
+            "url": {
+              "raw": "{{complaintBaseUrl}}/api/complaints/{{complaintId}}/request-details",
+              "host": ["{{complaintBaseUrl}}"],
+              "path": ["api", "complaints", "{{complaintId}}", "request-details"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Citizen Provides Details",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{citizenToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"The pothole is right in front of the Nallur Kandaswamy Temple main entrance gate. I have uploaded photos showing the depth of the hole.\"\n}"
+            },
+            "url": {
+              "raw": "{{complaintBaseUrl}}/api/complaints/{{complaintId}}/provide-details",
+              "host": ["{{complaintBaseUrl}}"],
+              "path": ["api", "complaints", "{{complaintId}}", "provide-details"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Status - Action Taken",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{officerToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"toStatus\": \"action_taken\",\n  \"note\": \"Pothole has been patched with temporary asphalt. Permanent resurfacing scheduled for next week.\"\n}"
+            },
+            "url": {
+              "raw": "{{complaintBaseUrl}}/api/complaints/{{complaintId}}/status",
+              "host": ["{{complaintBaseUrl}}"],
+              "path": ["api", "complaints", "{{complaintId}}", "status"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add Public Response",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{officerToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Thank you for reporting this issue. We have completed temporary patching and will complete permanent repairs by next Friday.\"\n}"
+            },
+            "url": {
+              "raw": "{{complaintBaseUrl}}/api/complaints/{{complaintId}}/responses",
+              "host": ["{{complaintBaseUrl}}"],
+              "path": ["api", "complaints", "{{complaintId}}", "responses"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Status - Resolved",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{officerToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"toStatus\": \"resolved\",\n  \"note\": \"Permanent resurfacing completed. Road is now fully restored.\"\n}"
+            },
+            "url": {
+              "raw": "{{complaintBaseUrl}}/api/complaints/{{complaintId}}/status",
+              "host": ["{{complaintBaseUrl}}"],
+              "path": ["api", "complaints", "{{complaintId}}", "status"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Complaint Timeline",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{officerToken}}" }],
+            "url": {
+              "raw": "{{complaintBaseUrl}}/api/complaints/{{complaintId}}/timeline",
+              "host": ["{{complaintBaseUrl}}"],
+              "path": ["api", "complaints", "{{complaintId}}", "timeline"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "console.log('Timeline events:', json.events?.length || 0);",
+                  "if (json.events) {",
+                  "  json.events.forEach((e, i) => {",
+                  "    console.log(`${i+1}. [${e.eventType}] ${e.description || ''}`);",
+                  "  });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "6. Geographic Division Reference",
+      "item": [
+        {
+          "name": "Info - Geographic IDs Reference",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://postman.govconnect.internal/info",
+              "host": ["https://postman.govconnect.internal/info"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Reference: Geographic Division UUIDs for Jaffna District",
+                  "// ===========================================",
+                  "// Northern Province: 550e8400-e29b-41d4-a716-446655440004",
+                  "// Jaffna District: 550e8400-e29b-41d4-a716-446655444001",
+                  "//",
+                  "// DS Divisions:",
+                  "// - Valikamam North: 550e8400-e29b-41d4-a716-446655450021",
+                  "// - Valikamam South: 550e8400-e29b-41d4-a716-446655450022",
+                  "// - Valikamam East: 550e8400-e29b-41d4-a716-446655450023",
+                  "// - Valikamam West: 550e8400-e29b-41d4-a716-446655450024",
+                  "// - Valikamam SW: 550e8400-e29b-41d4-a716-446655450025",
+                  "// - Vadamaradchi N: 550e8400-e29b-41d4-a716-446655450026",
+                  "// - Vadamaradchi E: 550e8400-e29b-41d4-a716-446655450027",
+                  "// - Vadamaradchi SW: 550e8400-e29b-41d4-a716-446655450028",
+                  "// - Thenmaradchi: 550e8400-e29b-41d4-a716-446655450029",
+                  "// - Nallur: 550e8400-e29b-41d4-a716-446655450030",
+                  "// - Jaffna: 550e8400-e29b-41d4-a716-446655450031",
+                  "// - Island South: 550e8400-e29b-41d4-a716-446655450032",
+                  "// - Delft: 550e8400-e29b-41d4-a716-446655450033",
+                  "// - Karainagar: 550e8400-e29b-41d4-a716-446655450034",
+                  "// GN Divisions (sample - Thirunelveli West): 550e8400-e29b-41d4-a716-446655460523",
+                  "// GN Divisions (sample - Nallur North): 550e8400-e29b-41d4-a716-446655460540",
+                  "//",
+                  "// These are stored in environment variables for use in requests"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "7. Complete Workflow Runner",
+      "item": [
+        {
+          "name": "Run Complete Flow",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://postman.govconnect.internal/workflow",
+              "host": ["https://postman.govconnect.internal/workflow"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "console.log('===============================================');",
+                  "console.log('GOVCONNECT COMPLETE WORKFLOW AUTOMATION');",
+                  "console.log('===============================================');",
+                  "console.log('');",
+                  "console.log('This collection automates the complete flow:');",
+                  "console.log('1. Admin creates authority officer with geographic jurisdiction');",
+                  "console.log('2. Officer sets up password via token');",
+                  "console.log('3. Citizen registers and submits complaint with location');",
+                  "console.log('4. Officer views queue filtered by jurisdiction');",
+                  "console.log('5. Officer assigns, updates status, adds notes');",
+                  "console.log('6. Officer requests additional details from citizen');",
+                  "console.log('7. Citizen provides requested details');",
+                  "console.log('8. Officer resolves complaint');",
+                  "console.log('9. Timeline shows complete audit trail');",
+                  "console.log('');",
+                  "console.log('Geographic hierarchy used:');",
+                  "console.log('- Province: Northern Province');",
+                  "console.log('- District: Jaffna');",
+                  "console.log('- DS Division: Nallur (for complaint) / Jaffna (for officer)');",
+                  "console.log('- GN Division: Thirunelveli West (for complaint) / Nallur North (for officer)');",
+                  "console.log('');",
+                  "console.log('Use the collection runner to execute all requests in sequence');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Ensure all environment variables are set with defaults",
+          "const defaults = {",
+          "  authBaseUrl: 'http://localhost:8081',",
+          "  complaintBaseUrl: 'http://localhost:8082',",
+          "  departmentBaseUrl: 'http://localhost:8083',",
+          "  adminEmail: 'admin@gov.lk',",
+          "  adminPassword: 'admin123',",
+          "  citizenEmail: 'citizen@test.lk',",
+          "  citizenPassword: 'Test@123',",
+          "  citizenName: 'Raj Kumar',",
+          "  citizenNic: '901234567V',",
+          "  citizenPhone: '0771234567',",
+          "  officerEmail: 'officer.ds@jaffna.lk',",
+          "  officerPassword: 'Officer@123',",
+          "  officerName: 'Siva Nadaraja',",
+          "  gsOfficerEmail: 'officer.gs@nallur.lk',",
+          "  gsOfficerName: 'Kumar Swaminathan',",
+          "  jaffnaProvinceId: '550e8400-e29b-41d4-a716-446655440004',",
+          "  jaffnaDistrictId: '550e8400-e29b-41d4-a716-446655444001',",
+          "  nallurDsId: '550e8400-e29b-41d4-a716-446655450030',",
+          "  jaffnaDsId: '550e8400-e29b-41d4-a716-446655450031',",
+          "  thirunelveliWestGnId: '550e8400-e29b-41d4-a716-446655460523',",
+          "  nallurNorthGnId: '550e8400-e29b-41d4-a716-446655460540'",
+          "};",
+          "",
+          "Object.keys(defaults).forEach(key => {",
+          "  if (!pm.environment.get(key)) {",
+          "    pm.environment.set(key, defaults[key]);",
+          "    console.log('Set default:', key);",
+          "  }",
+          "});"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    { "key": "authBaseUrl", "value": "http://localhost:8081" },
+    { "key": "complaintBaseUrl", "value": "http://localhost:8082" },
+    { "key": "departmentBaseUrl", "value": "http://localhost:8083" }
+  ]
+}

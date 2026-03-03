@@ -7,18 +7,32 @@ import {
   LayoutDashboard,
   Inbox,
   Users,
-  Building2,
+  UserPlus,
+  ClipboardList,
   LogOut,
   Shield,
   Menu,
   X,
+  UserCircle,
+  Building2,
+  Landmark,
 } from "lucide-react";
 
 import { getAccessToken, clearAccessToken } from "@/lib/auth";
+import { fetchIdentityMe, type IdentityMeResponse } from "@/lib/api";
 
-const navigation = [
+const baseNavigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Complaint Queue", href: "/queue", icon: Inbox },
+  { name: "My Profile", href: "/profile", icon: UserCircle },
+];
+
+const adminNavigation = [
+  { name: "Authorities", href: "/admin/authorities", icon: Users },
+  { name: "Pending Applications", href: "/admin/applications", icon: ClipboardList },
+  { name: "Create Officer", href: "/admin/create-officer", icon: UserPlus },
+  { name: "Departments", href: "/admin/departments", icon: Building2 },
+  { name: "Statutory Boards", href: "/admin/statutory-boards", icon: Landmark },
 ];
 
 export default function AuthenticatedLayout({
@@ -29,17 +43,25 @@ export default function AuthenticatedLayout({
   const pathname = usePathname();
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState<IdentityMeResponse | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const token = getAccessToken();
-    console.log("Auth layout - token check:", token ? "Token found" : "No token");
     if (!token) {
-      console.log("Redirecting to login...");
       router.replace("/login");
       return;
     }
-    setIsAuthenticated(true);
+
+    fetchIdentityMe()
+      .then((identity) => {
+        setUser(identity);
+        setIsLoading(false);
+      })
+      .catch(() => {
+        clearAccessToken();
+        router.replace("/login");
+      });
   }, [router]);
 
   const handleLogout = () => {
@@ -47,8 +69,15 @@ export default function AuthenticatedLayout({
     router.push("/login");
   };
 
-  if (!isAuthenticated) {
-    return null;
+  const isAdmin = user?.userType === "developer_admin";
+  const navigation = isAdmin ? [...baseNavigation, ...adminNavigation] : baseNavigation;
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
   }
 
   return (

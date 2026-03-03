@@ -61,6 +61,7 @@ public class SecurityConfig {
         .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth
             .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+            .requestMatchers(HttpMethod.GET, "/api/geo/**").permitAll()
             .requestMatchers(HttpMethod.POST, "/api/admin/authorities/password-setup/confirm").permitAll()
             .requestMatchers("/api/auth/**").permitAll()
             .requestMatchers("/api/dev/**")

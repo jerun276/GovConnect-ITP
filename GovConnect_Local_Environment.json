@@ -1,0 +1,306 @@
+{
+  "name": "GovConnect Local Development",
+  "values": [
+    {
+      "key": "authBaseUrl",
+      "value": "http://localhost:8081",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "complaintBaseUrl",
+      "value": "http://localhost:8082",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "departmentBaseUrl",
+      "value": "http://localhost:8083",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "adminEmail",
+      "value": "admin@gov.lk",
+      "type": "secret",
+      "enabled": true
+    },
+    {
+      "key": "adminPassword",
+      "value": "admin123",
+      "type": "secret",
+      "enabled": true
+    },
+    {
+      "key": "citizenEmail",
+      "value": "citizen@test.lk",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "citizenPassword",
+      "value": "Test@123",
+      "type": "secret",
+      "enabled": true
+    },
+    {
+      "key": "citizenName",
+      "value": "Raj Kumar",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "citizenNic",
+      "value": "901234567V",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "citizenPhone",
+      "value": "0771234567",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "officerEmail",
+      "value": "officer.ds@jaffna.lk",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "officerPassword",
+      "value": "Officer@123",
+      "type": "secret",
+      "enabled": true
+    },
+    {
+      "key": "officerName",
+      "value": "Siva Nadaraja",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "gsOfficerEmail",
+      "value": "officer.gs@nallur.lk",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "gsOfficerName",
+      "value": "Kumar Swaminathan",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "jaffnaProvinceId",
+      "value": "550e8400-e29b-41d4-a716-446655440004",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "jaffnaDistrictId",
+      "value": "550e8400-e29b-41d4-a716-446655444001",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "valikamamNorthDsId",
+      "value": "550e8400-e29b-41d4-a716-446655450021",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "valikamamSouthDsId",
+      "value": "550e8400-e29b-41d4-a716-446655450022",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "valikamamEastDsId",
+      "value": "550e8400-e29b-41d4-a716-446655450023",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "valikamamWestDsId",
+      "value": "550e8400-e29b-41d4-a716-446655450024",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "valikamamSouthWestDsId",
+      "value": "550e8400-e29b-41d4-a716-446655450025",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "vadamaradchiNorthDsId",
+      "value": "550e8400-e29b-41d4-a716-446655450026",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "vadamaradchiEastDsId",
+      "value": "550e8400-e29b-41d4-a716-446655450027",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "vadamaradchiSouthWestDsId",
+      "value": "550e8400-e29b-41d4-a716-446655450028",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "thenmaradchiDsId",
+      "value": "550e8400-e29b-41d4-a716-446655450029",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "nallurDsId",
+      "value": "550e8400-e29b-41d4-a716-446655450030",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "jaffnaDsId",
+      "value": "550e8400-e29b-41d4-a716-446655450031",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "islandSouthDsId",
+      "value": "550e8400-e29b-41d4-a716-446655450032",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "delftDsId",
+      "value": "550e8400-e29b-41d4-a716-446655450033",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "karainagarDsId",
+      "value": "550e8400-e29b-41d4-a716-446655450034",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "thirunelveliWestGnId",
+      "value": "550e8400-e29b-41d4-a716-446655460523",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "thirunelveliGnId",
+      "value": "550e8400-e29b-41d4-a716-446655460524",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "nallurNorthGnId",
+      "value": "550e8400-e29b-41d4-a716-446655460540",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "nallurSouthGnId",
+      "value": "550e8400-e29b-41d4-a716-446655460541",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "velanaiNorthGnId",
+      "value": "550e8400-e29b-41d4-a716-446655460592",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "delftWestGnId",
+      "value": "550e8400-e29b-41d4-a716-446655460617",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "karainagarEastGnId",
+      "value": "550e8400-e29b-41d4-a716-446655460623",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "departmentId",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "citizenToken",
+      "value": "",
+      "type": "secret",
+      "enabled": true
+    },
+    {
+      "key": "adminToken",
+      "value": "",
+      "type": "secret",
+      "enabled": true
+    },
+    {
+      "key": "officerToken",
+      "value": "",
+      "type": "secret",
+      "enabled": true
+    },
+    {
+      "key": "citizenUserId",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "officerUserId",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "gsOfficerUserId",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "passwordSetupToken",
+      "value": "",
+      "type": "secret",
+      "enabled": true
+    },
+    {
+      "key": "gsPasswordSetupToken",
+      "value": "",
+      "type": "secret",
+      "enabled": true
+    },
+    {
+      "key": "complaintId",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "complaintCode",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "pendingUserId",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    }
+  ],
+  "_postman_variable_scope": "environment"
+}
